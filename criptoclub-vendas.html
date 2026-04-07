@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CriptoClub — Investidores de Elite</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --gold: #D4A84B;
+    --gold-light: #F5D572;
+    --gold-dark: #A67C2E;
+    --bg: #0A0A0A;
+    --surface: #111111;
+    --card: #141414;
+    --text: #E8E0D0;
+    --muted: #666666;
+    --bullish: #2ECC71;
+    --bearish: #E74C3C;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    line-height: 1.6;
+  }
+
+  /* ─── NOISE TEXTURE ─── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
+  }
+
+  /* ─── TYPOGRAPHY ─── */
+  .display { font-family: 'Playfair Display', serif; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  /* ─── GOLD GRADIENT TEXT ─── */
+  .gold-text {
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold-light), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ─── CTA BUTTON ─── */
+  .btn-gold {
+    display: block;
+    width: 100%;
+    background: linear-gradient(135deg, #A67C2E 0%, #F5D572 50%, #D4A84B 100%);
+    color: #0A0A0A;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 18px 32px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 30px rgba(212,168,75,0.3);
+  }
+  .btn-gold::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .btn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(212,168,75,0.45); }
+  .btn-gold:hover::before { opacity: 1; }
+  .btn-gold:active { transform: translateY(0); }
+
+  .btn-outline {
+    display: block;
+    width: 100%;
+    background: transparent;
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 16px 32px;
+    border: 1px solid rgba(212,168,75,0.4);
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { background: rgba(212,168,75,0.06); border-color: var(--gold); }
+
+  /* ─── DIVIDER ─── */
+  .gold-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.3;
+  }
+
+  /* ─── CARD ─── */
+  .card {
+    background: var(--card);
+    border: 1px solid rgba(212,168,75,0.08);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .card-glow {
+    background: var(--card);
+    border: 1px solid rgba(212,168,75,0.15);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: 0 0 40px rgba(212,168,75,0.04);
+  }
+
+  /* ─── SECTIONS ─── */
+  section { position: relative; z-index: 1; }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  /* ─── ANIMATIONS ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse-gold {
+    0%, 100% { box-shadow: 0 0 20px rgba(212,168,75,0.15); }
+    50% { box-shadow: 0 0 40px rgba(212,168,75,0.35); }
+  }
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .fade-up { animation: fadeUp 0.7s ease both; }
+  .delay-1 { animation-delay: 0.1s; }
+  .delay-2 { animation-delay: 0.2s; }
+  .delay-3 { animation-delay: 0.3s; }
+  .delay-4 { animation-delay: 0.4s; }
+
+  /* ─── TICKER ─── */
+  .ticker-wrap {
+    background: var(--surface);
+    border-top: 1px solid rgba(212,168,75,0.1);
+    border-bottom: 1px solid rgba(212,168,75,0.1);
+    overflow: hidden;
+    padding: 10px 0;
+  }
+  .ticker-track {
+    display: flex;
+    gap: 48px;
+    animation: ticker 30s linear infinite;
+    width: max-content;
+  }
+  .ticker-item {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ticker-item .up { color: var(--bullish); }
+  .ticker-item .down { color: var(--bearish); }
+  .ticker-item .coin { color: var(--gold); font-weight: 600; }
+
+  /* ─── HERO ─── */
+  #hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 80px 0 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  #hero::before {
+    content: '';
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 800px;
+    background: radial-gradient(circle, rgba(212,168,75,0.07) 0%, transparent 65%);
+    pointer-events: none;
+  }
+  #hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(212,168,75,0.2), transparent);
+  }
+
+  .hero-logo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 48px;
+    justify-content: center;
+  }
+  .hero-logo-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--gold);
+  }
+  .hero-logo-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    letter-spacing: 5px;
+    color: var(--gold-dark);
+    text-transform: uppercase;
+    margin-top: 2px;
+  }
+
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .hero-h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 7vw, 64px);
+    font-weight: 900;
+    line-height: 1.1;
+    text-align: center;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .hero-h1 em {
+    font-style: italic;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    color: var(--muted);
+    text-align: center;
+    max-width: 480px;
+    margin: 0 auto 40px;
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  .hero-price-block {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+  .hero-price-old {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--muted);
+    text-decoration: line-through;
+    margin-bottom: 4px;
+  }
+  .hero-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .hero-price span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+    vertical-align: super;
+    margin-right: 4px;
+  }
+  .hero-price small {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .hero-price-guarantee {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--bullish);
+    text-transform: uppercase;
+    margin-top: 8px;
+  }
+
+  .hero-cta-wrap {
+    max-width: 400px;
+    margin: 0 auto 28px;
+  }
+
+  .hero-social-proof {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .hero-social-proof .dot { color: var(--gold); opacity: 0.4; }
+  .live-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--bullish);
+    animation: blink 1.5s ease-in-out infinite;
+    margin-right: 6px;
+  }
+
+  /* ─── DORES ─── */
+  #dores { padding: 80px 0; }
+  .dor-item {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 16px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .dor-item:last-child { border-bottom: none; }
+  .dor-x {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(231,76,60,0.1);
+    border: 1px solid rgba(231,76,60,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: var(--bearish);
+    margin-top: 2px;
+  }
+  .dor-text { font-size: 15px; color: #999; line-height: 1.6; }
+
+  /* ─── SOLUÇÃO ─── */
+  #solucao { padding: 80px 0; }
+  .solucao-intro {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .section-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 5vw, 42px);
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .section-sub {
+    font-size: 16px;
+    color: var(--muted);
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ─── ENTREGÁVEIS ─── */
+  #entregaveis { padding: 60px 0; }
+  .entrega-card {
+    background: var(--card);
+    border: 1px solid rgba(212,168,75,0.08);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .entrega-card::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--gold), var(--gold-dark));
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .entrega-card:hover { border-color: rgba(212,168,75,0.2); background: #161616; }
+  .entrega-card:hover::before { opacity: 1; }
+
+  .entrega-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+    background: rgba(212,168,75,0.08);
+    border: 1px solid rgba(212,168,75,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 22px;
+  }
+  .entrega-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .entrega-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .entrega-badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(46,204,113,0.1);
+    color: var(--bullish);
+    border: 1px solid rgba(46,204,113,0.2);
+    margin-top: 8px;
+  }
+  .entrega-badge.coming {
+    background: rgba(212,168,75,0.08);
+    color: var(--gold);
+    border-color: rgba(212,168,75,0.2);
+  }
+
+  /* ─── ALERTA LIVE ─── */
+  .alert-mock {
+    background: #0A0A0A;
+    border-radius: 10px;
+    padding: 14px 16px;
+    border-left: 3px solid var(--gold);
+    margin-top: 14px;
+  }
+  .alert-mock-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .alert-mock-text {
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .alert-mock-sub {
+    font-size: 11px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* ─── PROVA SOCIAL ─── */
+  #prova { padding: 80px 0; }
+  .depo-card {
+    background: var(--card);
+    border: 1px solid rgba(212,168,75,0.08);
+    border-radius: 12px;
+    padding: 22px;
+    margin-bottom: 12px;
+  }
+  .depo-stars {
+    color: var(--gold);
+    font-size: 14px;
+    margin-bottom: 10px;
+    letter-spacing: 2px;
+  }
+  .depo-text {
+    font-size: 14px;
+    color: #bbb;
+    line-height: 1.7;
+    font-style: italic;
+    margin-bottom: 14px;
+  }
+  .depo-text strong { color: var(--gold); font-style: normal; }
+  .depo-author {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .depo-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: #0A0A0A;
+    flex-shrink: 0;
+  }
+  .depo-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .depo-role { font-size: 11px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+
+  /* ─── STATS ─── */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin: 40px 0;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid rgba(212,168,75,0.08);
+    border-radius: 10px;
+    padding: 20px 16px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--gold);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+
+  /* ─── FUNDADOR ─── */
+  #fundador { padding: 80px 0; }
+  .founder-box {
+    background: var(--card);
+    border: 1px solid rgba(212,168,75,0.1);
+    border-radius: 16px;
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .founder-box::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(212,168,75,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .founder-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .founder-role {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .founder-text {
+    font-size: 15px;
+    color: #aaa;
+    line-height: 1.8;
+    margin-bottom: 12px;
+  }
+  .founder-text strong { color: var(--text); font-weight: 600; }
+
+  /* ─── FAQ ─── */
+  #faq { padding: 80px 0; }
+  .faq-item {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    cursor: pointer;
+  }
+  .faq-q {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text);
+    gap: 16px;
+  }
+  .faq-q .faq-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: rgba(212,168,75,0.08);
+    border: 1px solid rgba(212,168,75,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: var(--gold);
+    transition: transform 0.2s;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+  }
+  .faq-a {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.7;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s;
+  }
+  .faq-item.open .faq-a { max-height: 200px; padding-bottom: 16px; }
+  .faq-item.open .faq-icon { transform: rotate(45deg); }
+
+  /* ─── CTA FINAL ─── */
+  #cta-final {
+    padding: 100px 0;
+    position: relative;
+    overflow: hidden;
+  }
+  #cta-final::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(212,168,75,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-final-box {
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .urgency-badge {
+    display: inline-block;
+    background: rgba(231,76,60,0.12);
+    border: 1px solid rgba(231,76,60,0.25);
+    color: var(--bearish);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 28px;
+    animation: pulse-gold 3s ease-in-out infinite;
+  }
+
+  /* ─── GARANTIA ─── */
+  .garantia-box {
+    background: rgba(46,204,113,0.04);
+    border: 1px solid rgba(46,204,113,0.12);
+    border-radius: 12px;
+    padding: 20px 24px;
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    margin: 24px 0;
+  }
+  .garantia-icon {
+    font-size: 28px;
+    flex-shrink: 0;
+  }
+  .garantia-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--bullish);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .garantia-text {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid rgba(212,168,75,0.06);
+    padding: 40px 0;
+    text-align: center;
+  }
+  .footer-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 8px;
+  }
+  .footer-sub {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 4px;
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+  .footer-text {
+    font-size: 11px;
+    color: #444;
+    line-height: 1.8;
+  }
+
+  /* ─── STICKY CTA MOBILE ─── */
+  .sticky-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10,10,10,0.95);
+    backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(212,168,75,0.15);
+    padding: 12px 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+  .sticky-bar.visible { transform: translateY(0); }
+  .sticky-price {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+    flex-shrink: 0;
+  }
+  .sticky-cta {
+    flex: 1;
+    background: linear-gradient(135deg, #A67C2E, #F5D572, #D4A84B);
+    color: #0A0A0A;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+  }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .stat-num { font-size: 22px; }
+    .hero-h1 { font-size: 34px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- TICKER -->
+<div class="ticker-wrap">
+  <div class="ticker-track" id="ticker">
+    <span class="ticker-item"><span class="coin">BTC</span> $87,432 <span class="up">▲ +2.3%</span></span>
+    <span class="ticker-item"><span class="coin">ETH</span> $3,241 <span class="up">▲ +1.8%</span></span>
+    <span class="ticker-item"><span class="coin">SOL</span> $182 <span class="down">▼ -0.5%</span></span>
+    <span class="ticker-item"><span class="coin">BNB</span> $421 <span class="up">▲ +0.9%</span></span>
+    <span class="ticker-item"><span class="coin">FEAR&GREED</span> 68 — GANÂNCIA</span>
+    <span class="ticker-item"><span class="coin">DOMINÂNCIA BTC</span> 54.2%</span>
+    <span class="ticker-item"><span class="coin">BTC</span> $87,432 <span class="up">▲ +2.3%</span></span>
+    <span class="ticker-item"><span class="coin">ETH</span> $3,241 <span class="up">▲ +1.8%</span></span>
+    <span class="ticker-item"><span class="coin">SOL</span> $182 <span class="down">▼ -0.5%</span></span>
+    <span class="ticker-item"><span class="coin">BNB</span> $421 <span class="up">▲ +0.9%</span></span>
+    <span class="ticker-item"><span class="coin">FEAR&GREED</span> 68 — GANÂNCIA</span>
+    <span class="ticker-item"><span class="coin">DOMINÂNCIA BTC</span> 54.2%</span>
+  </div>
+</div>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+
+    <div class="hero-logo fade-up">
+      <svg width="40" height="40" viewBox="0 0 200 200">
+        <defs>
+          <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#D4A84B"/>
+            <stop offset="50%" stop-color="#F5D572"/>
+            <stop offset="100%" stop-color="#A67C2E"/>
+          </linearGradient>
+          <linearGradient id="g2" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#F5D572"/>
+            <stop offset="100%" stop-color="#A67C2E"/>
+          </linearGradient>
+        </defs>
+        <circle cx="100" cy="100" r="90" fill="none" stroke="url(#g1)" stroke-width="5"/>
+        <circle cx="100" cy="100" r="70" fill="none" stroke="url(#g1)" stroke-width="4"/>
+        <path d="M 100 10 A 90 90 0 0 1 175 45" fill="none" stroke="url(#g1)" stroke-width="5" stroke-linecap="round"/>
+        <polygon points="175,35 185,48 170,50" fill="url(#g1)"/>
+        <path d="M 100 190 A 90 90 0 0 1 25 155" fill="none" stroke="url(#g1)" stroke-width="5" stroke-linecap="round"/>
+        <polygon points="25,165 15,152 30,150" fill="url(#g1)"/>
+        <path d="M 130 68 A 42 42 0 1 0 130 132" fill="none" stroke="url(#g2)" stroke-width="14" stroke-linecap="round"/>
+        <circle cx="100" cy="100" r="18" fill="none" stroke="url(#g1)" stroke-width="4"/>
+        <circle cx="100" cy="100" r="6" fill="url(#g1)"/>
+        <line x1="130" y1="62" x2="130" y2="74" stroke="url(#g1)" stroke-width="4" stroke-linecap="round"/>
+        <line x1="130" y1="126" x2="130" y2="138" stroke="url(#g1)" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <div>
+        <div class="hero-logo-text">CRIPTOCLUB</div>
+        <div class="hero-logo-sub">Investidores de Elite</div>
+      </div>
+    </div>
+
+    <p class="hero-eyebrow fade-up delay-1"><span class="live-dot"></span>Vagas abertas agora</p>
+
+    <h1 class="hero-h1 fade-up delay-2">
+      O mercado não<br>espera quem<br><em>não sabe o que está<br>acontecendo.</em>
+    </h1>
+
+    <p class="hero-sub fade-up delay-3">
+      Enquanto você tenta entender os gráficos sozinho, outros estão recebendo análises prontas, alertas em tempo real e as melhores entradas do mercado. Todos os dias.
+    </p>
+
+    <div class="hero-price-block fade-up delay-4">
+      <div class="hero-price-old">R$297/mês</div>
+      <div class="hero-price">
+        <span>R$</span>97<small>/mês</small>
+      </div>
+      <div class="hero-price-guarantee">✓ Preço bloqueado para sempre</div>
+    </div>
+
+    <div class="hero-cta-wrap fade-up delay-4">
+      <a href="https://pay.kirvano.com/e29e1850-4a73-4a2d-b416-496a4c4dfd70" class="btn-gold">
+        QUERO ENTRAR NO CRIPTOCLUB →
+      </a>
+      <div style="text-align:center; margin-top:10px;">
+        <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--muted);">Cancele quando quiser &nbsp;·&nbsp; Acesso imediato</span>
+      </div>
+    </div>
+
+    <div class="hero-social-proof fade-up delay-4">
+      <span><span class="live-dot"></span>Grupo ativo</span>
+      <span class="dot">·</span>
+      <span>Análises diárias</span>
+      <span class="dot">·</span>
+      <span>+7 anos de mercado</span>
+    </div>
+
+  </div>
+</section>
+
+<!-- TICKER 2 -->
+<div class="gold-line"></div>
+
+<!-- DORES -->
+<section id="dores">
+  <div class="container">
+    <p class="label" style="text-align:center; margin-bottom:32px;">Você se identifica?</p>
+    <h2 class="section-title" style="text-align:center; margin-bottom:40px;">
+      Investir em cripto<br>não precisa ser <em style="font-style:italic; color:var(--muted);">assim</em>
+    </h2>
+
+    <div class="card">
+      <div class="dor-item">
+        <div class="dor-x">✕</div>
+        <p class="dor-text">Você fica horas tentando entender se é hora de comprar ou vender, sem nenhuma certeza no final.</p>
+      </div>
+      <div class="dor-item">
+        <div class="dor-x">✕</div>
+        <p class="dor-text">Já perdeu uma oportunidade boa porque não ficou sabendo a tempo — e viu o preço disparar depois.</p>
+      </div>
+      <div class="dor-item">
+        <div class="dor-x">✕</div>
+        <p class="dor-text">Segue influencers no Twitter mas não sabe quem realmente entende do mercado e quem só faz ruído.</p>
+      </div>
+      <div class="dor-item">
+        <div class="dor-x">✕</div>
+        <p class="dor-text">Sente que o mercado é um cassino — e que você está sempre do lado errado da mesa.</p>
+      </div>
+      <div class="dor-item">
+        <div class="dor-x">✕</div>
+        <p class="dor-text">Tem vontade de diversificar em altcoins mas não sabe quais têm potencial de verdade e quais são lixo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="gold-line" style="margin: 0 20px;"></div>
+
+<!-- SOLUÇÃO -->
+<section id="solucao">
+  <div class="container">
+    <div class="solucao-intro">
+      <p class="label" style="margin-bottom:16px;">A solução</p>
+      <h2 class="section-title">
+        Imagine ter um analista<br>no seu WhatsApp.<br><span class="gold-text">Todo. Dia.</span>
+      </h2>
+      <p class="section-sub" style="margin-top:16px;">
+        Isso é o CriptoClub. Uma comunidade de elite onde você recebe tudo que precisa para investir com inteligência — sem perder horas pesquisando sozinho.
+      </p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num">7+</div>
+        <div class="stat-label">Anos no mercado</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">500+</div>
+        <div class="stat-label">Leads ativos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">24h</div>
+        <div class="stat-label">Análise diária</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ENTREGÁVEIS -->
+<section id="entregaveis">
+  <div class="container">
+    <p class="label" style="text-align:center; margin-bottom:12px;">O que você recebe</p>
+    <h2 class="section-title" style="text-align:center; margin-bottom:32px;">
+      Tudo que você precisa para<br><span class="gold-text">não perder nenhuma oportunidade</span>
+    </h2>
+
+    <!-- Card 1: WhatsApp -->
+    <div class="entrega-card">
+      <div class="entrega-icon">📡</div>
+      <div style="flex:1;">
+        <div class="entrega-title">Grupo VIP no WhatsApp</div>
+        <div class="entrega-desc">
+          Alertas de mercado em tempo real. Quando o Bitcoin move, quando uma altcoin entra em zona de compra, quando o Fear & Greed vira — você recebe antes de todo mundo. Análise de RSI, suporte, resistência, tendência. Tudo mastigado, direto no seu celular.
+        </div>
+        <div class="alert-mock">
+          <div class="alert-mock-label">⚡ Alerta CriptoClub</div>
+          <div class="alert-mock-text">BTC caiu 5% em 2h — zona de compra</div>
+          <div class="alert-mock-sub">RSI em 28. Fear & Greed: 22 (Medo extremo). Historicamente, boa entrada.</div>
+        </div>
+        <div class="entrega-badge">Ativo agora</div>
+      </div>
+    </div>
+
+    <!-- Card 2: Hotseat -->
+    <div class="entrega-card">
+      <div class="entrega-icon">🎙️</div>
+      <div style="flex:1;">
+        <div class="entrega-title">Hotseat Mensal ao Vivo</div>
+        <div class="entrega-desc">
+          Uma vez por mês, você e os outros membros têm acesso direto a mim. Tira dúvidas, análise da sua carteira ao vivo, revisão do mercado e decisões para o próximo mês. Esse tipo de acesso, em outros produtos, custa mais de R$1.000 por sessão.
+        </div>
+        <div class="entrega-badge">Todo mês</div>
+      </div>
+    </div>
+
+    <!-- Card 3: Área de membros -->
+    <div class="entrega-card">
+      <div class="entrega-icon">📚</div>
+      <div style="flex:1;">
+        <div class="entrega-title">Área de Membros Exclusiva</div>
+        <div class="entrega-desc">
+          Conteúdos gravados para você avançar no seu ritmo. Desde como ler um gráfico até estratégias avançadas de gestão de risco. Tudo organizado, tudo acessível, atualizado constantemente.
+        </div>
+        <div class="entrega-badge">Acesso imediato</div>
+      </div>
+    </div>
+
+    <!-- Card 4: App (cereja) -->
+    <div class="entrega-card" style="border-color: rgba(212,168,75,0.2);">
+      <div class="entrega-icon" style="background: rgba(212,168,75,0.12); border-color: rgba(212,168,75,0.25);">🍒</div>
+      <div style="flex:1;">
+        <div class="entrega-title">App Exclusivo <span style="font-family:'JetBrains Mono',monospace; font-size:10px; color:var(--gold); letter-spacing:1px; font-weight:400;">(em breve)</span></div>
+        <div class="entrega-desc">
+          Altcoin Radar com IA, analisador de carteira, indicador de sentimento. Ferramentas que eu mesmo uso para filtrar oportunidades — disponíveis só para membros do CriptoClub. Quem entrar agora como <strong style="color:var(--gold);">membro fundador</strong> ganha acesso gratuito no lançamento.
+        </div>
+        <div class="entrega-badge coming">Membro Fundador ganha acesso grátis</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="gold-line" style="margin: 0 20px;"></div>
+
+<!-- FUNDADOR -->
+<section id="fundador">
+  <div class="container">
+    <p class="label" style="text-align:center; margin-bottom:32px;">Quem está por trás</p>
+    <div class="founder-box">
+      <div class="founder-name">João Pedro Marçal</div>
+      <div class="founder-role">Fundador — CriptoClub</div>
+      <p class="founder-text">
+        Comecei no mercado cripto quando a maioria ainda achava que Bitcoin era golpe. Já passei por bull markets, bear markets, collapses, e aprendi na prática o que separa quem lucra de quem fica segurando o prejuízo.
+      </p>
+      <p class="founder-text">
+        São <strong>7 anos criando conteúdo sobre cripto</strong>, com mentoria ativa para investidores que gerenciam mais de <strong>R$250.000</strong> sob orientação direta. O CriptoClub é o próximo passo — acesso às mesmas análises que dou para os meus mentorados, mas ao alcance de qualquer pessoa.
+      </p>
+      <div style="display:flex; gap:20px; flex-wrap:wrap; margin-top:20px; padding-top:20px; border-top:1px solid rgba(212,168,75,0.08);">
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">TikTok</div>
+          <div style="font-size:13px; color:var(--gold);">@marcalcripto</div>
+        </div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">YouTube</div>
+          <div style="font-size:13px; color:var(--gold);">@marcalcripto</div>
+        </div>
+        <div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:2px; color:var(--muted); text-transform:uppercase; margin-bottom:4px;">Mentoria</div>
+          <div style="font-size:13px; color:var(--gold);">5 alunos ativos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROVA SOCIAL -->
+<section id="prova">
+  <div class="container">
+    <p class="label" style="text-align:center; margin-bottom:12px;">Quem já segue</p>
+    <h2 class="section-title" style="text-align:center; margin-bottom:32px;">
+      Resultados reais de<br>pessoas reais
+    </h2>
+
+    <div class="depo-card">
+      <div class="depo-stars">★★★★★</div>
+      <p class="depo-text">"Eu ficava perdido olhando pro gráfico e não sabia o que fazer. Com o grupo do Marçal, eu recebi um alerta no WhatsApp e fiz a entrada certinha. <strong>Em 3 dias o ativo subiu 18%.</strong> Valeu mais do que qualquer curso que já comprei."</p>
+      <div class="depo-author">
+        <div class="depo-avatar">R</div>
+        <div>
+          <div class="depo-name">Rodrigo S.</div>
+          <div class="depo-role">Empresário · São Paulo</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="depo-card">
+      <div class="depo-stars">★★★★★</div>
+      <p class="depo-text">"Já seguia o conteúdo do Marçal de graça e aprendi muito. Mas no clube o nível é outro. As análises são diretas, sem enrolação, e o hotseat mensal é <strong>muito mais valioso do que parece</strong>. Minha carteira mudou de patamar."</p>
+      <div class="depo-author">
+        <div class="depo-avatar">T</div>
+        <div>
+          <div class="depo-name">Thais M.</div>
+          <div class="depo-role">Analista · Curitiba</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="depo-card">
+      <div class="depo-stars">★★★★★</div>
+      <p class="depo-text">"Investi R$97 e tomei uma decisão que me poupou de perder quase R$3.000 numa entrada errada. O Marçal avisou antes no grupo que o ativo estava fraco. <strong>Melhor R$97 que já gastei.</strong>"</p>
+      <div class="depo-author">
+        <div class="depo-avatar">F</div>
+        <div>
+          <div class="depo-name">Felipe A.</div>
+          <div class="depo-role">Investidor · Bauru</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="gold-line" style="margin: 0 20px;"></div>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <p class="label" style="text-align:center; margin-bottom:12px;">Dúvidas comuns</p>
+    <h2 class="section-title" style="text-align:center; margin-bottom:40px;">Perguntas frequentes</h2>
+
+    <div id="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">
+          Preciso ter experiência com cripto para entrar?
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a">Não. O CriptoClub é desenhado para funcionar tanto para quem está começando quanto para quem já tem experiência. As análises são explicadas de forma clara e objetiva — você não precisa saber ler gráficos para se beneficiar dos alertas.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">
+          O preço vai subir no futuro?
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a">Sim. Quem entrar agora como membro fundador trava o preço em R$97/mês para sempre. Quando o app for lançado e novas funcionalidades forem adicionadas, o valor do plano vai aumentar — mas o seu preço fica congelado.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">
+          Posso cancelar a qualquer momento?
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a">Sim, sem burocracia. Você pode cancelar pelo próprio painel da Kirvano a qualquer momento. Nenhuma multa, nenhuma cobrança extra. O acesso continua até o fim do período pago.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">
+          Com que frequência chegam análises no WhatsApp?
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a">Diariamente. Toda manhã você recebe o contexto do mercado — Bitcoin, altcoins relevantes, indicadores de sentimento. Além disso, sempre que uma oportunidade ou alerta importante surgir durante o dia, você recebe em tempo real.</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">
+          Isso é consultoria de investimentos?
+          <div class="faq-icon">+</div>
+        </div>
+        <div class="faq-a">Não. O CriptoClub é um serviço educacional e informativo. As análises são baseadas em estudo técnico e compartilhadas como conteúdo educativo. Cada membro toma suas próprias decisões de investimento com base nas informações recebidas.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section id="cta-final">
+  <div class="container">
+    <div class="cta-final-box">
+      <div class="urgency-badge">⚡ Vagas limitadas — preço de fundador</div>
+      
+      <h2 class="section-title" style="margin-bottom:16px;">
+        O mercado não vai<br>esperar você decidir.
+      </h2>
+      <p style="font-size:16px; color:var(--muted); max-width:440px; margin:0 auto 32px; line-height:1.7;">
+        Por R$97 por mês — menos que um jantar fora — você passa a ter análises diárias, alertas em tempo real e acesso direto a quem entende do mercado. Cancele quando quiser.
+      </p>
+
+      <div style="max-width:440px; margin:0 auto;">
+        <div style="background:var(--card); border:1px solid rgba(212,168,75,0.15); border-radius:12px; padding:28px; margin-bottom:20px;">
+          <div class="label" style="margin-bottom:16px;">CriptoClub — Plano Fundador</div>
+          
+          <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:24px;">
+            <div style="display:flex; gap:10px; align-items:center; font-size:14px; color:#aaa;">
+              <span style="color:var(--bullish); font-size:12px;">✓</span> Grupo VIP WhatsApp com alertas diários
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; font-size:14px; color:#aaa;">
+              <span style="color:var(--bullish); font-size:12px;">✓</span> Hotseat mensal ao vivo (acesso direto)
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; font-size:14px; color:#aaa;">
+              <span style="color:var(--bullish); font-size:12px;">✓</span> Área de membros com conteúdos exclusivos
+            </div>
+            <div style="display:flex; gap:10px; align-items:center; font-size:14px; color:#aaa;">
+              <span style="color:var(--gold); font-size:12px;">★</span> App exclusivo no lançamento (membro fundador)
+            </div>
+          </div>
+
+          <div style="text-align:center; margin-bottom:20px;">
+            <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); text-decoration:line-through; margin-bottom:4px;">De R$297/mês</div>
+            <div style="font-family:'Playfair Display',serif; font-size:48px; font-weight:900; color:var(--gold); line-height:1;">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:18px; vertical-align:super; font-weight:400;">R$</span>97
+              <span style="font-family:'JetBrains Mono',monospace; font-size:14px; font-weight:400; color:var(--muted);">/mês</span>
+            </div>
+          </div>
+
+          <a href="https://pay.kirvano.com/e29e1850-4a73-4a2d-b416-496a4c4dfd70" class="btn-gold" style="animation: pulse-gold 3s ease-in-out infinite;">
+            ENTRAR NO CRIPTOCLUB AGORA →
+          </a>
+        </div>
+
+        <div class="garantia-box">
+          <div class="garantia-icon">🛡️</div>
+          <div>
+            <div class="garantia-title">Preço garantido para sempre</div>
+            <div class="garantia-text">Quem entra agora paga R$97/mês eternamente. Quando o app for lançado e o plano subir de preço, o seu fica congelado. Essa promessa é pública e irrevogável.</div>
+          </div>
+        </div>
+
+        <p style="text-align:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:#444; margin-top:16px; line-height:1.8;">
+          Pagamento seguro via Kirvano &nbsp;·&nbsp; Cancele quando quiser<br>Acesso imediato após confirmação do pagamento
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-logo">CRIPTOCLUB</div>
+    <div class="footer-sub">Investidores de Elite</div>
+    <p class="footer-text">
+      © 2026 CriptoClub · João Pedro Marçal<br>
+      @marcalcripto · Bauru, SP<br><br>
+      Este produto é educacional e informativo. Não constitui recomendação de investimento.<br>
+      Investimentos em criptoativos envolvem riscos. Invista com responsabilidade.
+    </p>
+  </div>
+</footer>
+
+<!-- STICKY BAR -->
+<div class="sticky-bar" id="stickyBar">
+  <div class="sticky-price">R$97<span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);font-weight:400;">/mês</span></div>
+  <a href="https://pay.kirvano.com/e29e1850-4a73-4a2d-b416-496a4c4dfd70" class="sticky-cta">ENTRAR AGORA →</a>
+</div>
+
+<script>
+  // FAQ toggle
+  document.querySelectorAll('.faq-item').forEach(item => {
+    item.querySelector('.faq-q').addEventListener('click', () => {
+      const isOpen = item.classList.contains('open');
+      document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('open'));
+      if (!isOpen) item.classList.add('open');
+    });
+  });
+
+  // Sticky bar on scroll
+  const stickyBar = document.getElementById('stickyBar');
+  let heroBottom = 0;
+  function updateHeroBottom() {
+    heroBottom = document.getElementById('hero').getBoundingClientRect().bottom + window.scrollY;
+  }
+  updateHeroBottom();
+  window.addEventListener('resize', updateHeroBottom);
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > heroBottom - window.innerHeight) {
+      stickyBar.classList.add('visible');
+    } else {
+      stickyBar.classList.remove('visible');
+    }
+  });
+</script>
+</body>
+</html>
